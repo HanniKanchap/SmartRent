@@ -7,7 +7,7 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
 
-def scrape_olx_delhi(start_page=2, end_page=150):
+def scrape_olx_delhi(start_page=2, end_page=200):
     listings = []
 
     for page_num in range(start_page, end_page + 1):
@@ -15,7 +15,7 @@ def scrape_olx_delhi(start_page=2, end_page=150):
         print(f"🔎 Scraping page {page_num}...")
 
         try:
-            response = requests.get(url, headers=headers, timeout=15)
+            response = requests.get(url, headers=headers, timeout=60)
             
         except requests.RequestException as e:
             print(f"❌ Error on page {page_num}: {e}")
@@ -52,5 +52,5 @@ def scrape_olx_delhi(start_page=2, end_page=150):
 # Run and export
 data = scrape_olx_delhi()
 df = pd.DataFrame(data)
-df.to_csv("olx_delhi_apartments_1.csv", index=False)
-print(f"✅ Scraped {len(df)} listings across pages {2} to {150}.")
+df.to_csv("scraped_olx_data.csv", index=False)
+print(f"✅ Scraped {len(df)} listings across pages {2} to {200}.")
