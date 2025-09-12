@@ -3,3 +3,8 @@ numpy
 requests
 beautifulsoup4
 ipykernel
+xgboost
+streamlit
+python-dotenv
+langchain_groq
+plotly
