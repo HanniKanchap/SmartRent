@@ -10,4 +10,5 @@ langchain_groq
 plotly
 streamlit-mic-recorder
 gtts 
+nbconvert
 streamlit-extras
