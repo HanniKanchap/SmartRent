@@ -21,15 +21,21 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install jupyter nbconvert
+
+    - name: Register Jupyter kernel
+      run: |
+        python -m ipykernel install --user --name python3 --display-name "Python 3"
 
     - name: Run OLX scraping script
       run: |
         python Scraping/olx_scraping.py
 
-    - name: Run cleaning notebook
+    - name: Run cleaning notebook on updated data
       run: |
-        jupyter nbconvert --to notebook --execute data_cleaning/data_cleaning.ipynb --inplace
+        jupyter nbconvert --to notebook --execute data_cleaning/data_cleaning.ipynb \
+          --inplace \
+          --ExecutePreprocessor.kernel_name=python3 \
+          --ExecutePreprocessor.timeout=600
 
     - name: Commit updated data files
       run: |
@@ -40,3 +46,9 @@ jobs:
         git commit -m "Auto-update scraped and cleaned rental data"
         git push
       continue-on-error: true
+
+    - name: Upload executed notebook for inspection
+      uses: actions/upload-artifact@v3
+      with:
+        name: cleaned-notebook
+        path: data_cleaning/data_cleaning.ipynb
