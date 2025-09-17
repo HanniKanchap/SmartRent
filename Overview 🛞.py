@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
+from datetime import datetime, timedelta
 
 # Load data
-@st.cache_data
 def load_data():
     df = pd.read_csv("data/cleaned_data.csv")
     df.dropna(subset=["Price", "Area"], inplace=True)
@@ -14,7 +14,7 @@ df = load_data()
 
 # Page config
 st.set_page_config(page_title="SmartRent", layout="wide")
-# Inject Dark Theme CSS
+
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -101,16 +101,26 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+# Compute last Tuesday and next Tuesday
+today = datetime.today()
+offset = (today.weekday() - 1) % 7  
+last_tuesday = today - timedelta(days=offset)
+next_tuesday = last_tuesday + timedelta(days=7)
+
+# Format date as DD-MM-YYYY
+last_updated_str = last_tuesday.strftime("%d-%m-%Y")
+
 st.image('./assets/image.png',use_container_width=True)
 # Scorecards
-col1, col2, col3 = st.columns(3)
+col1, col2, col3,col4 = st.columns(4)
 with col1:
     st.markdown(f"<div class='scorecard'><h3>Price Range</h3><p>₹{int(df['Price'].min())} – ₹{int(df['Price'].max())}</p></div>", unsafe_allow_html=True)
 with col2:
-    st.markdown(f"<div class='scorecard'><h3>Locations Covered (In Delhi)</h3><p>{len(df['Location'].unique())}</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='scorecard'><h3>Locations Covered</h3><p>{len(df['Location'].unique())}</p></div>", unsafe_allow_html=True)
 with col3:
     st.markdown(f"<div class='scorecard'><h3>Total Listings</h3><p>{len(df)}</p></div>", unsafe_allow_html=True)
-
+with col4:
+    st.markdown(f"<div class='scorecard'><h3>Data (Last Updated)</h3><p>{last_updated_str}</p></div>", unsafe_allow_html=True)
 st.divider()
 
 # FAQs Section
@@ -178,7 +188,7 @@ st.markdown("""
         }
     </style>
 
-    <a href="/Chat" class="chatbot-button">Chat ✨</a>
+    <a href="/AI_Assistant✨" class="chatbot-button">Chat ✨</a>
 """, unsafe_allow_html=True)
 # Footer
 st.markdown("<div class='footer'>© 2025 SmartRent • Built with precision by HANNI</div>", unsafe_allow_html=True)

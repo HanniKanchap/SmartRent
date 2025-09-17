@@ -8,3 +8,6 @@ streamlit
 python-dotenv
 langchain_groq
 plotly
+streamlit-mic-recorder
+gtts 
+streamlit-extras
