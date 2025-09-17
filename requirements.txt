@@ -12,3 +12,4 @@ streamlit-mic-recorder
 gtts 
 nbconvert
 streamlit-extras
+jupyter
