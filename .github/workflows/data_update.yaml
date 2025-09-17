@@ -46,9 +46,3 @@ jobs:
         git commit -m "Auto-update scraped and cleaned rental data"
         git push
       continue-on-error: true
-
-    - name: Upload executed notebook for inspection
-      uses: actions/upload-artifact@v3
-      with:
-        name: cleaned-notebook
-        path: data_cleaning/data_cleaning.ipynb
