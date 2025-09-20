@@ -22,24 +22,13 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Register Jupyter kernel
+    - name: Run scraping and cleaning pipeline
       run: |
-        python -m ipykernel install --user --name python3 --display-name "Python 3"
-
-    - name: Run OLX scraping script
-      run: |
-        python Scraping/olx_scraping.py
-
-    - name: Run cleaning notebook on updated data
-      run: |
-        jupyter nbconvert --to notebook --execute data_cleaning/data_cleaning.ipynb \
-          --inplace \
-          --ExecutePreprocessor.kernel_name=python3 \
-          --ExecutePreprocessor.timeout=600
+        python pipeline.py
 
     - name: Commit updated data files
       run: |
-        git config --global user.name "Hanni"
+        git config --global user.name "SmartRent IO"
         git config --global user.email "hannikanchap11@gmail.com"
         git add scraped_olx_data.csv
         git add data/cleaned_data.csv
