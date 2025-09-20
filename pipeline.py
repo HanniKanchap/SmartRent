@@ -15,7 +15,7 @@ def scrape_olx_delhi(start_page=2, end_page=40):
         print(f"🔎 Scraping page {page_num}...")
 
         try:
-            response = requests.get(url, headers=headers, timeout=60)
+            response = requests.get(url, headers=headers, timeout=300)
             
         except requests.RequestException as e:
             print(f"❌ Error on page {page_num}: {e}")
