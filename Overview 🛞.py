@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
-from datetime import datetime, timedelta
 
 # Load data
 def load_data():
@@ -101,26 +100,15 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Compute last Tuesday and next Tuesday
-today = datetime.today()
-offset = (today.weekday() - 1) % 7  
-last_tuesday = today - timedelta(days=offset)
-next_tuesday = last_tuesday + timedelta(days=7)
-
-# Format date as DD-MM-YYYY
-last_updated_str = last_tuesday.strftime("%d-%m-%Y")
-
 st.image('./assets/image.png',use_container_width=True)
 # Scorecards
-col1, col2, col3,col4 = st.columns(4)
+col1, col2, col3 = st.columns(4)
 with col1:
     st.markdown(f"<div class='scorecard'><h3>Price Range</h3><p>₹{int(df['Price'].min())} – ₹{int(df['Price'].max())}</p></div>", unsafe_allow_html=True)
 with col2:
     st.markdown(f"<div class='scorecard'><h3>Locations Covered</h3><p>{len(df['Location'].unique())}</p></div>", unsafe_allow_html=True)
 with col3:
     st.markdown(f"<div class='scorecard'><h3>Total Listings</h3><p>{len(df)}</p></div>", unsafe_allow_html=True)
-with col4:
-    st.markdown(f"<div class='scorecard'><h3>Data (Last Updated)</h3><p>{last_updated_str}</p></div>", unsafe_allow_html=True)
 st.divider()
 
 # FAQs Section
