@@ -121,12 +121,6 @@ with st.expander("What is SmartRent?"):
         "It delivers clean, deduplicated, and structured rental data for backend-driven dashboards and analytics."
     )
 
-with st.expander("How often is the data updated?"):
-    st.write(
-        "Our GitHub Actions workflow runs weekly, fetching fresh listings, cleaning them, and appending them to the existing dataset. "
-        "This ensures continuity, reproducibility, and minimal manual intervention."
-    )
-
 with st.expander("Can I filter listings?"):
     st.write(
         "Yes. The dashboard supports filtering by price, BHK count, and area. You can also extend it to include location, furnishing status, or amenities."
