@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
+import os
 
 # Load data
 def load_data():
@@ -102,7 +103,7 @@ st.markdown("""
 
 st.image('./assets/image.png',use_container_width=True)
 # Scorecards
-col1, col2, col3 = st.columns(4)
+col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(f"<div class='scorecard'><h3>Price Range</h3><p>₹{int(df['Price'].min())} – ₹{int(df['Price'].max())}</p></div>", unsafe_allow_html=True)
 with col2:
@@ -154,6 +155,47 @@ with st.form("contact_form"):
         st.markdown(f"<a href='{mailto_link}' class='contact-button'>📨 Click to Send   </a>", unsafe_allow_html=True)
     elif submitted:
         st.warning("Please fill in both your email and message before composing.")
+from datetime import datetime
+
+REVIEW_FILE = "data/reviews.csv"
+st.divider()
+st.subheader("🗣️ User Reviews")
+
+# Ensure file exists with headers
+if not os.path.exists(REVIEW_FILE):
+    pd.DataFrame(columns=["Name", "Review", "Timestamp"]).to_csv(REVIEW_FILE, index=False)
+
+# Review submission form
+with st.form("review_form"):
+    reviewer_name = st.text_input("Your Name", placeholder="Anonymous")
+    review_text = st.text_area("Your Review", placeholder="Share your experience with SmartRent...")
+    review_submit = st.form_submit_button("Post Review")
+
+    if review_submit and review_text:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        new_review = pd.DataFrame([{
+            "Name": reviewer_name if reviewer_name else "Anonymous",
+            "Review": review_text,
+            "Timestamp": timestamp
+        }])
+        new_review.to_csv(REVIEW_FILE, mode='a', header=False, index=False)
+        st.success("Thanks for sharing your review!")
+
+# Display reviews
+try:
+    reviews_df = pd.read_csv(REVIEW_FILE)
+    for _, row in reviews_df[::-1].iterrows():
+        st.markdown(f"""
+    <div class='scorecard'>
+        <div style='display: flex; justify-content: space-between; align-items: center;'>
+            <h3 style='margin: 0;'>{row['Name']}</h3>
+            <small style='color: #aaa;'> {row['Timestamp']}</small>
+        </div>
+        <p style='margin-top: 8px;'>{row['Review']}</p>
+    </div>
+""", unsafe_allow_html=True)
+except Exception:
+    st.info("No reviews yet. Be the first to share your thoughts!")
 
 st.markdown("""
     <style>
