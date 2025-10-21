@@ -7,7 +7,7 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
 
-def scrape_olx_delhi(start_page=2, end_page=40):
+def scrape_olx_delhi(start_page=2, end_page=80):
     listings = []
 
     for page_num in range(start_page, end_page + 1):
@@ -52,8 +52,10 @@ def scrape_olx_delhi(start_page=2, end_page=40):
 # Run and export
 data = scrape_olx_delhi()
 df = pd.DataFrame(data)
+if len(df) == 0:
+    exit(0)
 df.to_csv("scraped_olx_data.csv", index=False)
-print(f"✅ Scraped {len(df)} listings across pages {2} to {50}.")
+print(f"✅ Scraped {len(df)} listings across pages {2} to {80}.")
 
 ## Cleaning data
 df = df.drop_duplicates().reset_index(drop = True)
