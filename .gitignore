@@ -1,3 +1,4 @@
 RentEnv
 .env
 model
+.streamlit/secrets.toml

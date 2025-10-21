@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
+from supabase import create_client
+from datetime import datetime
 import os
 
 # Load data
@@ -149,15 +151,15 @@ with st.form("contact_form"):
         st.markdown(f"<a href='{mailto_link}' class='contact-button'>📨 Click to Send   </a>", unsafe_allow_html=True)
     elif submitted:
         st.warning("Please fill in both your email and message before composing.")
-from datetime import datetime
 
-REVIEW_FILE = "data/reviews.csv"
+# Supabase credentials
+supabase = create_client(
+    st.secrets["supabase"]["url"],
+    st.secrets["supabase"]["key"]
+)
+
 st.divider()
 st.subheader("🗣️ User Reviews")
-
-# Ensure file exists with headers
-if not os.path.exists(REVIEW_FILE):
-    pd.DataFrame(columns=["Name", "Review", "Timestamp"]).to_csv(REVIEW_FILE, index=False)
 
 # Review submission form
 with st.form("review_form"):
@@ -165,30 +167,37 @@ with st.form("review_form"):
     review_text = st.text_area("Your Review", placeholder="Share your experience with SmartRent...")
     review_submit = st.form_submit_button("Post Review")
 
-    if review_submit and review_text:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_review = pd.DataFrame([{
-            "Name": reviewer_name if reviewer_name else "Anonymous",
-            "Review": review_text,
-            "Timestamp": timestamp
-        }])
-        new_review.to_csv(REVIEW_FILE, mode='a', header=False, index=False)
-        st.success("Thanks for sharing your review!")
+    # Strip whitespace and validate
+    if review_submit:
+        cleaned_review = review_text.strip()
+        if cleaned_review:
+            timestamp = datetime.now().isoformat()
+            supabase.table('SmartRent Reviews').insert({
+                "Name": reviewer_name.strip() if reviewer_name.strip() else "Anonymous",
+                "Review": cleaned_review,
+                "Timestamp": timestamp
+            }).execute()
+            st.success("Thanks for sharing your review!")
+            st.rerun()
+        else:
+            st.warning("Please enter a valid review before submitting.")
 
 # Display reviews
-try:
-    reviews_df = pd.read_csv(REVIEW_FILE)
-    for _, row in reviews_df[::-1].iterrows():
+response = supabase.table('SmartRent Reviews').select("*").order("Timestamp", desc=True).execute()
+reviews = response.data
+
+if reviews:
+    for row in reviews:
         st.markdown(f"""
-    <div class='scorecard'>
-        <div style='display: flex; justify-content: space-between; align-items: center;'>
-            <h3 style='margin: 0;'>{row['Name']}</h3>
-            <small style='color: #aaa;'> {row['Timestamp']}</small>
+        <div class='scorecard'>
+            <div style='display: flex; justify-content: space-between; align-items: center;'>
+                <h3 style='margin: 0;'>{row['Name']}</h3>
+                <small style='color: #aaa;'> {datetime.fromisoformat(row['Timestamp']).strftime('%d %b %Y, %I:%M %p')}</small>
+            </div>
+            <p style='margin-top: 8px;'>{row['Review']}</p>
         </div>
-        <p style='margin-top: 8px;'>{row['Review']}</p>
-    </div>
-""", unsafe_allow_html=True)
-except Exception:
+        """, unsafe_allow_html=True)
+else:
     st.info("No reviews yet. Be the first to share your thoughts!")
 
 st.markdown("""
